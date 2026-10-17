@@ -1,0 +1,17 @@
+# Gradle / Android 构建产物
+build/
+.gradle/
+local.properties
+*.apk
+*.aab
+
+# IDE
+.idea/
+*.iml
+
+# 调试 keystore 不进仓库（公开发布请勿使用调试签名）
+*.keystore
+*.jks
+
+# 系统文件
+.DS_Store

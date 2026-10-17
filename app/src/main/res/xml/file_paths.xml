@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider 路径（M5）：成品视频分享/打开。
+  只暴露应用私有 filesDir（含 tasks/<id>/output.mp4），不暴露整个存储。
+-->
+<paths>
+    <files-path name="shared" path="." />
+</paths>

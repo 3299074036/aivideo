@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App 名暂定「影译」，provisional，后续可改 -->
+    <string name="app_name">影译</string>
+    <!-- 首页显著位置的版权合规提示 -->
+    <string name="compliance_notice">仅处理您拥有权利或已获授权的视频；下载他人视频可能违反平台条款与著作权法，后果自负</string>
+</resources>

@@ -1,0 +1,70 @@
+# 影译依赖版本目录：所有版本号集中在此声明，模块禁止硬编码版本。
+# 版本选型依据（2026-10 实测可构建组合，沿用视记 M1~M6 验证组合）：
+# - AGP 8.13.2 + Gradle 8.14.x：支持 compileSdk 36；KSP 2.3.x 需要 AGP 8.8+ 的 addKspConfigurations API
+# - Kotlin 2.3.21 + KSP 2.3.12（KSP 2.3 起改为独立版本号，不再与 Kotlin 版本耦合）
+# - Compose BOM 2026.06.01：compose-ui 1.11.4 + material3 1.4.0（M3 Expressive 稳定版）
+# - FFmpeg：dev.ffmpegkit-maintained:ffmpeg-kit-full:8.1.7（LGPL-3.0 构建）。
+#   严禁使用 -gpl 变体（x264/x265 会使整个 App 受 GPL-3.0 约束）。选型依据见
+#   docs/research/aivideo/第三方组件许可证.md 与技术方案 §4.1。
+
+[versions]
+agp = "8.13.2"
+kotlin = "2.3.21"
+ksp = "2.3.12"
+composeBom = "2026.06.01"
+activityCompose = "1.10.1"
+coreKtx = "1.15.0"
+lifecycle = "2.8.7"
+navigationCompose = "2.9.8"
+hilt = "2.57.2"
+hiltNavigationCompose = "1.3.0"
+room = "2.8.5"
+retrofit = "3.0.0"
+okhttp = "4.12.0"
+gson = "2.13.1"
+ffmpegKit = "8.1.7"
+datastore = "1.2.1"
+junit = "4.13.2"
+securityCrypto = "1.1.0"
+# M5：任务中心长任务（WorkManager）。注意：不引入 androidx.hilt:hilt-work——
+# Hilt 2.57.2 + KSP 下 @HiltWorker 绑定代码不生成，WorkerFactory 必须手写（见 data/work/AiVideoWorkerFactory）。
+workRuntime = "2.12.0"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+# FFmpeg（M1 核心）：社区维护分支 ffmpegkit-maintained 的 LGPL 构建。
+# 严禁 -gpl 变体。8.1 LTS 线，arm64-v8a + x86_64，16KB 页对齐。
+ffmpeg-kit-full = { group = "dev.ffmpegkit-maintained", name = "ffmpeg-kit-full", version.ref = "ffmpegKit" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+# M5：长任务（WorkManager + 前台服务）；WorkerFactory 手写，不用 hilt-work
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntime" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

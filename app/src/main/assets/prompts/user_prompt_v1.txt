@@ -1,0 +1,5 @@
+目标语言：{target_language}
+翻译风格：{style}
+{glossary_section}
+下面是 {segment_count} 段字幕（{chunk_info}），请逐段翻译并严格按格式输出：
+{segments}
