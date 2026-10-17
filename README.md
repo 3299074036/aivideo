@@ -30,10 +30,10 @@ curl -L -o gradle/wrapper/gradle-wrapper.jar \
 # 2. 拉取 sherpa-onnx AAR（~47MB，带 SHA-256 校验）
 bash libs/fetch-sherpa-onnx.sh
 
-# 2. 构建（需按 docs/构建说明.md 配置代理环境变量）
+# 3. 构建（需按 docs/构建说明.md 配置代理环境变量）
 ./gradlew assembleDebug --no-daemon
 
-# 3. 测试
+# 4. 测试
 ./gradlew testDebugUnitTest --no-daemon
 ```
 
