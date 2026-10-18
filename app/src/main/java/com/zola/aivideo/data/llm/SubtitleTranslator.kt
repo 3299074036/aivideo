@@ -58,7 +58,7 @@ data class TranslationOutcome(
  */
 @Singleton
 class SubtitleTranslator @Inject constructor(
-    private val llmClient: LlmClient,
+    private val engineResolver: LlmEngineResolver,
     private val promptLoader: PromptLoader,
     private val glossaryRepository: GlossaryRepository,
 ) {
@@ -66,8 +66,11 @@ class SubtitleTranslator @Inject constructor(
         request: TranslateRequest,
         onProgress: (TranslateProgress) -> Unit = {},
     ): TranslationOutcome {
+        val engine = engineResolver.current()
         require(request.segments.isNotEmpty()) { "没有可翻译的分段" }
-        require(request.llmConfig.isComplete()) { "LLM 配置不完整" }
+        if (engine.requiresApiConfig) {
+            require(request.llmConfig.isComplete()) { "LLM 配置不完整" }
+        }
 
         val glossaryTerms = if (request.useGlossary) {
             glossaryRepository.getByTargetLang(request.targetLanguage.displayName)
@@ -99,7 +102,7 @@ class SubtitleTranslator @Inject constructor(
             )
             val raw = StringBuilder()
             try {
-                llmClient.streamChat(request.llmConfig, messages) { delta ->
+                engine.streamChat(messages) { delta ->
                     raw.append(delta)
                     onProgress(TranslateProgress.Streaming(raw.length))
                 }
@@ -117,7 +120,7 @@ class SubtitleTranslator @Inject constructor(
                 val repairMessages =
                     promptLoader.buildRepairMessages(issues, chunk, offset)
                 val repairRaw = StringBuilder()
-                llmClient.streamChat(request.llmConfig, repairMessages) { delta ->
+                engine.streamChat(repairMessages) { delta ->
                     repairRaw.append(delta)
                     onProgress(TranslateProgress.Streaming(repairRaw.length))
                 }

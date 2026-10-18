@@ -10,6 +10,8 @@ android {
     namespace = "com.zola.aivideo"
     // compileSdk 36（与视记同组合，保证 Compose BOM 2026.06.01 可用）；targetSdk 35
     compileSdk = 36
+    // 本地 LLM（llama.cpp）用 NDK 30（与视记一致）
+    ndkVersion = "30.0.16248370"
 
     defaultConfig {
         applicationId = "com.zola.aivideo"
@@ -68,6 +70,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // 本地 LLM：llama.cpp JNI（M7），cmake 配置见 app/src/main/cpp/CMakeLists.txt
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
     buildFeatures {
         buildConfig = true
         compose = true
@@ -117,7 +127,10 @@ dependencies {
 
     // FFmpeg（M1 核心）：ffmpegkit-maintained 社区维护分支 LGPL 构建。
     // 严禁 -gpl 变体。AAR 内含 arm64-v8a + x86_64 .so，abiFilters 只取 arm64-v8a。
+    // 注意：maintained 分支 POM 漏声明 smart-exception-java 传递依赖，显式补上，
+    // 否则 native 加载失败时异常处理分支报 NoClassDefFoundError（2026-10-17 真机实锤）。
     implementation(libs.ffmpeg.kit.full)
+    implementation(libs.smart.exception.java)
 
     // 端侧 ASR（M2）：sherpa-onnx 官方 AAR（Apache-2.0），已内置 onnxruntime，
     // 禁止再引入 onnxruntime-android。AAR 解析顺序：workspace 级 dependencies/sherpa-onnx/
@@ -135,8 +148,5 @@ dependencies {
     // EncryptedSharedPreferences：后续里程碑 LLM / 云服务 Key 加密存储
     implementation(libs.androidx.security.crypto)
 
-    // M5：任务中心长任务（WorkManager + 前台服务）。
-    // 注意：不引入 androidx.hilt:hilt-work（@HiltWorker 在 Hilt 2.57.2 + KSP 下绑定代码不生成），
-    // WorkerFactory 手写（data/work/AiVideoWorkerFactory.kt）。
-    implementation(libs.androidx.work.runtime.ktx)
+    // 2026-10-17：WorkManager 已移除（改用 TaskScheduler + StageRunner 前台协程直连）。
 }

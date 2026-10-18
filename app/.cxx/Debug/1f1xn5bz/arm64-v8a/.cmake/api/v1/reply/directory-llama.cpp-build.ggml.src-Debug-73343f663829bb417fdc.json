@@ -1,0 +1,60 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install",
+			"ggml_add_backend_library",
+			"ggml_add_cpu_backend_variant_impl"
+		],
+		"files" : 
+		[
+			"/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src/CMakeLists.txt",
+			"/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src/ggml-cpu/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 596,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 27,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 396,
+				"parent" : 2
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"bin/libggml-cpu.so"
+			],
+			"targetId" : "ggml-cpu::@9eac4d86846e905b5082",
+			"targetIndex" : 3,
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "llama.cpp-build/ggml/src",
+		"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src"
+	}
+}

@@ -1,0 +1,304 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "llama.cpp-build",
+					"childIndexes" : 
+					[
+						2,
+						5,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-llama.cpp-build-Debug-30a30845e38c6c289ca7.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0"
+				},
+				{
+					"build" : "llama.cpp-build/ggml",
+					"childIndexes" : 
+					[
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-llama.cpp-build.ggml-Debug-89414d5c3c4bcaa0b617.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 2,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml"
+				},
+				{
+					"build" : "llama.cpp-build/ggml/src",
+					"childIndexes" : 
+					[
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-llama.cpp-build.ggml.src-Debug-73343f663829bb417fdc.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 2,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src",
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3
+					]
+				},
+				{
+					"build" : "llama.cpp-build/ggml/src/ggml-cpu",
+					"jsonFile" : "directory-llama.cpp-build.ggml.src.ggml-cpu-Debug-c18145fdfbdedbdd7248.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 2,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src/ggml-cpu"
+				},
+				{
+					"build" : "llama.cpp-build/src",
+					"jsonFile" : "directory-llama.cpp-build.src-Debug-e19bd184257dadd0320f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/src",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "llama.cpp-build/vendor",
+					"childIndexes" : 
+					[
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"jsonFile" : "directory-llama.cpp-build.vendor-Debug-6efb9d451e020abce2d8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor"
+				},
+				{
+					"build" : "llama.cpp-build/vendor/hash",
+					"jsonFile" : "directory-llama.cpp-build.vendor.hash-Debug-aac9feb07aa5616face3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/hash",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "llama.cpp-build/vendor/miniaudio",
+					"jsonFile" : "directory-llama.cpp-build.vendor.miniaudio-Debug-ae4404cd3f5a2c12650e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/miniaudio"
+				},
+				{
+					"build" : "llama.cpp-build/vendor/nlohmann",
+					"jsonFile" : "directory-llama.cpp-build.vendor.nlohmann-Debug-287f5167da4e0807305f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/nlohmann"
+				},
+				{
+					"build" : "llama.cpp-build/vendor/sheredom",
+					"jsonFile" : "directory-llama.cpp-build.vendor.sheredom-Debug-f075b4c62d3300282c79.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/sheredom"
+				},
+				{
+					"build" : "llama.cpp-build/vendor/stb",
+					"jsonFile" : "directory-llama.cpp-build.vendor.stb-Debug-23af8bbe43bcc9901dbf.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 1,
+					"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/stb"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "aivideo_llama",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"childIndexes" : 
+					[
+						2
+					],
+					"directoryIndexes" : 
+					[
+						1,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"name" : "llama.cpp",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						4,
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2,
+						3,
+						4
+					],
+					"name" : "ggml",
+					"parentIndex" : 1,
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "aivideo_llama::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-aivideo_llama-Debug-d1e5ba56675a5536533b.json",
+					"name" : "aivideo_llama",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ggml::@9eac4d86846e905b5082",
+					"jsonFile" : "target-ggml-Debug-7a81283c290ddc57aaaa.json",
+					"name" : "ggml",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ggml-base::@9eac4d86846e905b5082",
+					"jsonFile" : "target-ggml-base-Debug-3059395a83713910db84.json",
+					"name" : "ggml-base",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ggml-cpu::@9eac4d86846e905b5082",
+					"jsonFile" : "target-ggml-cpu-Debug-0576b40bc1fe1d415e8e.json",
+					"name" : "ggml-cpu",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "llama::@1e0fa18b64cd2597abc3",
+					"jsonFile" : "target-llama-Debug-984ef4ee984929c37e64.json",
+					"name" : "llama",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "vendor-hash::@06631ad75f2613d36de6",
+					"jsonFile" : "target-vendor-hash-Debug-a55a2653a126f44ef4f3.json",
+					"name" : "vendor-hash",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a",
+		"source" : "/home/hatch/workspace/7Z1H/codes/aivideo/app/src/main/cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

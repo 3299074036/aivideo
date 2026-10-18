@@ -56,6 +56,7 @@ fun TranslateConfigScreen(
     viewModel: TranslateConfigViewModel,
     onBack: () -> Unit,
     onOpenLlmSettings: () -> Unit,
+    onOpenModels: () -> Unit,
     onOpenGlossary: () -> Unit,
     onStartTranslate: () -> Unit,
     /** 任务模式下确认完成（返回任务详情页）。 */
@@ -227,8 +228,14 @@ fun TranslateConfigScreen(
                             color = MaterialTheme.colorScheme.onErrorContainer,
                         )
                         Spacer(Modifier.height(tokens.spacing.sm))
-                        OutlinedButton(onClick = onOpenLlmSettings) {
-                            Text("去 LLM 设置", style = tokens.type.label)
+                        OutlinedButton(
+                            onClick = if (viewModel.blockGoesToModels) onOpenModels
+                            else onOpenLlmSettings,
+                        ) {
+                            Text(
+                                if (viewModel.blockGoesToModels) "去模型管理页" else "去 LLM 设置",
+                                style = tokens.type.label,
+                            )
                         }
                     }
                 }

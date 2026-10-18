@@ -224,11 +224,7 @@ fun AiVideoNavGraph(
                 onVideoPicked = { uri ->
                     navController.navigate(Routes.importResult(uri.toString()))
                 },
-                onOpenModels = { navController.navigate(Routes.MODEL_MANAGEMENT) },
-                onOpenLlmSettings = { navController.navigate(Routes.LLM_SETTINGS) },
                 onImportSubtitle = { navController.navigate(Routes.SUBTITLE_IMPORT) },
-                onOpenTtsModels = { navController.navigate(Routes.TTS_MODELS) },
-                onOpenTtsSettings = { navController.navigate(Routes.TTS_SETTINGS) },
                 onOpenTasks = { navController.navigate(Routes.TASK_LIST) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
             )
@@ -362,6 +358,7 @@ fun AiVideoNavGraph(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onOpenLlmSettings = { navController.navigate(Routes.LLM_SETTINGS) },
+                onOpenModels = { navController.navigate(Routes.MODEL_MANAGEMENT) },
                 onOpenGlossary = { navController.navigate(Routes.GLOSSARY) },
                 onStartTranslate = {
                     navController.navigate(Routes.TRANSLATE_PROGRESS) {
@@ -398,12 +395,14 @@ fun AiVideoNavGraph(
             )
         }
         // ---------- M4：TTS / 配音 ----------
+        // 2026-10-17：TTS_MODELS 已合并到 MODEL_MANAGEMENT（模型管理页配音模型区），
+        // 此路由保留作兼容，直接重定向到模型管理页。
         composable(Routes.TTS_MODELS) {
-            val viewModel: TtsModelViewModel = hiltViewModel()
-            TtsModelScreen(
-                onBack = { navController.popBackStack() },
-                viewModel = viewModel,
-            )
+            LaunchedEffect(Unit) {
+                navController.navigate(Routes.MODEL_MANAGEMENT) {
+                    popUpTo(Routes.TTS_MODELS) { inclusive = true }
+                }
+            }
         }
         composable(Routes.TTS_SETTINGS) {
             val viewModel: TtsSettingsViewModel = hiltViewModel()
@@ -430,7 +429,7 @@ fun AiVideoNavGraph(
                         popUpTo(Routes.DUB_CONFIG) { inclusive = true }
                     }
                 },
-                onManageTtsModel = { navController.navigate(Routes.TTS_MODELS) },
+                onManageTtsModel = { navController.navigate(Routes.MODEL_MANAGEMENT) },
                 onTtsSettings = { navController.navigate(Routes.TTS_SETTINGS) },
                 // M5 任务模式：确认后直接回任务详情页
                 onTaskModeDone = { navController.popBackStack() },
@@ -509,7 +508,6 @@ fun AiVideoNavGraph(
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onOpenModels = { navController.navigate(Routes.MODEL_MANAGEMENT) },
-                onOpenTtsModels = { navController.navigate(Routes.TTS_MODELS) },
                 onOpenLlmSettings = { navController.navigate(Routes.LLM_SETTINGS) },
                 onOpenTtsSettings = { navController.navigate(Routes.TTS_SETTINGS) },
                 onOpenGlossary = { navController.navigate(Routes.GLOSSARY) },

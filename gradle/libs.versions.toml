@@ -56,6 +56,10 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 # FFmpeg（M1 核心）：社区维护分支 ffmpegkit-maintained 的 LGPL 构建。
 # 严禁 -gpl 变体。8.1 LTS 线，arm64-v8a + x86_64，16KB 页对齐。
 ffmpeg-kit-full = { group = "dev.ffmpegkit-maintained", name = "ffmpeg-kit-full", version.ref = "ffmpegKit" }
+# FFmpegKit 异常处理分支依赖 com.arthenica.smartexception.java.Exceptions，
+# 但 maintained 分支的 POM 未声明该传递依赖（2026-10-17 真机 NoClassDefFoundError 实锤），
+# 此处显式补上，否则 native 加载失败时连错误都报不出来。
+smart-exception-java = { group = "com.arthenica", name = "smart-exception-java", version = "0.2.1" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 # M5：长任务（WorkManager + 前台服务）；WorkerFactory 手写，不用 hilt-work

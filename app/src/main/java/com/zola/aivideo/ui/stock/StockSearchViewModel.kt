@@ -3,6 +3,8 @@ package com.zola.aivideo.ui.stock
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.content.Context
+import android.net.Uri
 import com.google.gson.Gson
 import com.zola.aivideo.data.stock.StockClient
 import com.zola.aivideo.data.stock.StockClip
@@ -11,11 +13,14 @@ import com.zola.aivideo.data.stock.StockPreferences
 import com.zola.aivideo.data.stock.StockProvider
 import com.zola.aivideo.data.task.TaskFiles
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
@@ -49,6 +54,7 @@ data class StockSearchUiState(
 @HiltViewModel
 class StockSearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    @ApplicationContext private val context: Context,
     private val prefs: StockPreferences,
     private val credentialStore: StockCredentialStore,
     private val client: StockClient,
@@ -158,5 +164,47 @@ class StockSearchViewModel @Inject constructor(
                 DownloadedClip(f, c)
             },
         )
+    }
+
+    /**
+     * 从本地导入视频作为素材（2026-10-17 本地化）。
+     *
+     * 用户没有 Pexels/Pixabay Key 时的本地替代方案：从本机选一个视频文件，
+     * 拷到任务 stock 目录，后续替换流程与在线素材一致。
+     * @return 导入后的文件名（供导航到替换页），失败返回 null。
+     */
+    suspend fun importLocalVideo(uri: Uri): String? = withContext(Dispatchers.IO) {
+        val taskId = _uiState.value.taskId
+        if (taskId <= 0L) return@withContext null
+        try {
+            val stockDir = taskFiles.stockDir(taskId)
+            if (!stockDir.exists()) stockDir.mkdirs()
+            val fileName = "local_${System.currentTimeMillis()}.mp4"
+            val dest = File(stockDir, fileName)
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                dest.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return@withContext null
+            // 写一个极简的元信息 sidecar（来源标注为本地）
+            val metaFile = File(stockDir, "local_${System.currentTimeMillis()}.json")
+            metaFile.writeText(
+                gson.toJson(
+                    mapOf(
+                        "provider" to "LOCAL",
+                        "authorName" to "本地视频",
+                        "licenseName" to "用户自有",
+                    ),
+                ),
+            )
+            // 刷新已下载列表
+            refreshDownloaded()
+            fileName
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                downloadError = "导入失败：${e.message ?: e.javaClass.simpleName}",
+            )
+            null
+        }
     }
 }

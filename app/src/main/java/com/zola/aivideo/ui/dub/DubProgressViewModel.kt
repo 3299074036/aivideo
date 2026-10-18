@@ -56,8 +56,23 @@ class DubProgressViewModel @Inject constructor(
 
     private fun start() {
         if (job?.isActive == true) return
-        val options = holder.options
-        val inputs = holder.toDubInputs()
+        // 修复（2026-10-17）：holder 为空或异常时之前直接空白页，此处捕获并显示错误
+        val options = try {
+            holder.options
+        } catch (e: Exception) {
+            _uiState.value = DubProgressUiState(
+                error = "配音数据异常：${e.message ?: e.javaClass.simpleName}，请返回重试",
+            )
+            return
+        }
+        val inputs = try {
+            holder.toDubInputs()
+        } catch (e: Exception) {
+            _uiState.value = DubProgressUiState(
+                error = "配音数据异常：${e.message ?: e.javaClass.simpleName}，请返回重试",
+            )
+            return
+        }
         if (inputs.isEmpty()) {
             _uiState.value = DubProgressUiState(error = "没有可配音的分段")
             return

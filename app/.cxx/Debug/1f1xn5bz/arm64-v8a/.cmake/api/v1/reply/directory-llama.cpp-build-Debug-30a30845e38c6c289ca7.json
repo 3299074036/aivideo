@@ -1,0 +1,89 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 290,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 309,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 317,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"bin/libllama.so"
+			],
+			"targetId" : "llama::@1e0fa18b64cd2597abc3",
+			"targetIndex" : 4,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/include/llama.h",
+				"/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/include/llama-cpp.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/llama",
+			"paths" : 
+			[
+				"/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/llama.cpp-build/llama-config.cmake",
+				"/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/llama.cpp-build/llama-config-version.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/pkgconfig",
+			"paths" : 
+			[
+				"/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/llama.cpp-build/llama.pc"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "llama.cpp-build",
+		"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0"
+	}
+}

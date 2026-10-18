@@ -20,12 +20,21 @@ import kotlin.coroutines.resume
 @Singleton
 class FFmpegService @Inject constructor() {
 
-    /** FFmpeg 版本字符串（如 "n8.1.2"），用于诊断页与问题排查；取不到返回 null。 */
-    fun getVersion(): String? = try {
-        FFmpegKitConfig.getFFmpegVersion()
-    } catch (_: Exception) {
-        null
+    /**
+     * FFmpeg 版本与加载错误（诊断用）：成功返回版本，失败第二项为原始错误信息。
+     *
+     * 注意：必须 catch Throwable——native 库加载失败时抛的是 Error
+     *（如 UnsatisfiedLinkError；FFmpegKit 还会把它再包一层 Error 重抛），
+     *只抓 Exception 会直接崩掉调用方页面（2026-10-17 模型管理页闪退的根因）。
+     */
+    fun getVersionInfo(): Pair<String?, String?> = try {
+        FFmpegKitConfig.getFFmpegVersion() to null
+    } catch (t: Throwable) {
+        null to (t.message ?: t.toString()).take(300)
     }
+
+    /** FFmpeg 版本字符串（如 "n8.1.2"），用于诊断页与问题排查；取不到返回 null。 */
+    fun getVersion(): String? = getVersionInfo().first
 
     /** 当前是否有正在执行的会话。 */
     fun hasActiveSession(): Boolean = activeSessionId.get() != 0L

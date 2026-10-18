@@ -67,6 +67,7 @@ class TtsPreferences @Inject constructor(
         val CLOUD_VOICE = stringPreferencesKey("cloud_voice")
         val CLOUD_MODEL = stringPreferencesKey("cloud_model")
         val CLOUD_BASE_URL = stringPreferencesKey("cloud_base_url")
+        val CLOUD_PROVIDER = stringPreferencesKey("cloud_provider")
     }
 
     val voiceSid: Flow<Int> = context.ttsDataStore.data.map {
@@ -133,4 +134,13 @@ class TtsPreferences @Inject constructor(
     suspend fun setCloudBaseUrl(url: String) {
         context.ttsDataStore.edit { it[Keys.CLOUD_BASE_URL] = url.trim().trimEnd('/') }
     }
+
+    /** 云 TTS 服务商预设 id（M7），默认 custom（保持老用户原有手填配置不变）。 */
+    val cloudProvider: Flow<String> = context.ttsDataStore.data.map {
+        it[Keys.CLOUD_PROVIDER] ?: TtsProviderCatalog.CUSTOM.id
+    }
+    suspend fun setCloudProvider(providerId: String) {
+        context.ttsDataStore.edit { it[Keys.CLOUD_PROVIDER] = providerId }
+    }
+    suspend fun getCloudProvider(): String = cloudProvider.first()
 }

@@ -9,9 +9,12 @@ import com.google.gson.Gson
 import com.zola.aivideo.data.llm.GlossaryRepository
 import com.zola.aivideo.data.llm.LlmConfig
 import com.zola.aivideo.data.llm.LlmCredentialStore
+import com.zola.aivideo.data.llm.LlmEngineId
+import com.zola.aivideo.data.llm.LlmModelCatalog
 import com.zola.aivideo.data.llm.LlmPreferences
 import com.zola.aivideo.data.llm.TargetLanguage
 import com.zola.aivideo.data.llm.TranslateStyle
+import com.zola.aivideo.data.download.ModelDownloadManager
 import com.zola.aivideo.data.task.PersistedTranslateOptions
 import com.zola.aivideo.data.task.StageState
 import com.zola.aivideo.data.task.TaskFiles
@@ -29,7 +32,7 @@ import javax.inject.Inject
  * - 进入翻译前检查 LLM 配置完整性：缺 Key 或地址时提示去 LLM 设置页
  *
  * 任务模式（taskId > 0，M5）：分段从任务目录的 transcript.json 读取；
- * 确认后把配置持久化到任务并调度 TranslateWorker，不走前台翻译流程。
+ * 确认后把配置持久化到任务并调度翻译阶段，不走前台翻译流程。
  */
 @HiltViewModel
 class TranslateConfigViewModel @Inject constructor(
@@ -37,6 +40,7 @@ class TranslateConfigViewModel @Inject constructor(
     private val prefs: LlmPreferences,
     private val credentialStore: LlmCredentialStore,
     private val glossaryRepository: GlossaryRepository,
+    private val downloadManager: ModelDownloadManager,
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
     private val taskFiles: TaskFiles,
@@ -68,6 +72,10 @@ class TranslateConfigViewModel @Inject constructor(
 
     /** null 表示检查通过；非 null 为阻断文案。 */
     var blockReason by mutableStateOf<String?>(null)
+        private set
+
+    /** 阻断时按钮去向：true=模型管理页（本地模型未下载），false=LLM 设置页（API 未配置）。 */
+    var blockGoesToModels by mutableStateOf(false)
         private set
 
     var llmReady by mutableStateOf(false)
@@ -111,20 +119,40 @@ class TranslateConfigViewModel @Inject constructor(
         options = options.copy(bilingual = v)
     }
 
-    /** 开始翻译前检查；通过返回可用的 LlmConfig。 */
+    /**
+     * 开始翻译前检查；通过返回可用的 LlmConfig。
+     *
+     * 按引擎分流（M7）：本地引擎不校验 API 配置，改为检查本地模型是否已下载。
+     */
     suspend fun checkAndBuildConfig(): LlmConfig? {
         val segments = currentSegments()
         if (segments.isEmpty()) {
             blockReason = "没有可翻译的字幕分段"
+            blockGoesToModels = false
             return null
         }
-        val baseUrl = prefs.getBaseUrl()
-        val model = prefs.getModel()
-        val key = credentialStore.getApiKey()
-        val config = LlmConfig(baseUrl, key, model)
-        if (!config.isComplete()) {
-            blockReason = "请先在「LLM 设置」中填写完整地址、Key 和模型名"
-            return null
+        // 本地引擎：跳过 API 校验，检查本地模型
+        val config = if (prefs.getLlmEngine() == LlmEngineId.LOCAL) {
+            val localModelId = prefs.getLocalModel()
+            val entry = LlmModelCatalog.entryOf(localModelId)
+            if (entry == null || !downloadManager.isInstalled(entry)) {
+                blockReason = "本地模型尚未下载，请先在模型管理页下载"
+                blockGoesToModels = true
+                return null
+            }
+            // 本地引擎不需要 API 配置，传空占位（SubtitleTranslator 按引擎取数）
+            LlmConfig("", "", "")
+        } else {
+            val baseUrl = prefs.getBaseUrl()
+            val model = prefs.getModel()
+            val key = credentialStore.getApiKey()
+            val apiConfig = LlmConfig(baseUrl, key, model)
+            if (!apiConfig.isComplete()) {
+                blockReason = "请先在「LLM 设置」中填写完整地址、Key 和模型名"
+                blockGoesToModels = false
+                return null
+            }
+            apiConfig
         }
         llmReady = true
         blockReason = null
@@ -135,7 +163,7 @@ class TranslateConfigViewModel @Inject constructor(
         options = options.copy(targetLanguage = target)
 
         if (taskMode) {
-            // 任务模式：配置落盘 → 调度 Worker，不走前台翻译流程
+            // 任务模式：配置落盘 → 调度阶段，不走前台翻译流程
             val persisted = PersistedTranslateOptions.from(
                 targetLanguage = target,
                 customLangName = customLangName.trim(),

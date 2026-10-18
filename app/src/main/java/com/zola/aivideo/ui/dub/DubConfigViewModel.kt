@@ -48,7 +48,7 @@ data class DubConfigUiState(
  *
  * 初始化时：校验分段非空、读取偏好、检查端侧模型就绪与云 Key 配置。
  * 任务模式（taskId > 0，M5）：分段从任务目录的 translated.json 读取，
- * 视频路径用任务的源视频；确认后把配置持久化并调度 DubWorker。
+ * 视频路径用任务的源视频；确认后把配置持久化并调度配音阶段。
  */
 @HiltViewModel
 class DubConfigViewModel @Inject constructor(
@@ -157,7 +157,7 @@ class DubConfigViewModel @Inject constructor(
             prefs.setDubStrategy(s.strategy)
             prefs.setMixOriginalRatio(s.mixOriginalRatio)
             if (taskMode) {
-                // 任务模式：配置落盘 → 调度 DubWorker
+                // 任务模式：配置落盘 → 调度配音阶段
                 taskRepository.saveStageOptions(taskId, TaskStage.DUB, gson.toJson(options))
                 taskRepository.updateStageState(taskId, TaskStage.DUB, StageState.PENDING)
                 taskScheduler.scheduleStage(taskId, TaskStage.DUB)

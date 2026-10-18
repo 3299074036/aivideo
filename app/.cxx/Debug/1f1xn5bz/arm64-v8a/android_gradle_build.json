@@ -1,0 +1,104 @@
+{
+  "buildFiles": [
+    "/home/hatch/workspace/7Z1H/codes/aivideo/app/src/main/cpp/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src/ggml-cpu/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/src/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/hash/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/miniaudio/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/nlohmann/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/sheredom/CMakeLists.txt",
+    "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/stb/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/hatch/workspace/7Z1H/tools/android-sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/hatch/workspace/7Z1H/tools/android-sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "aivideo_llama::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "aivideo_llama",
+      "output": "/home/hatch/workspace/7Z1H/codes/aivideo/app/build/intermediates/cxx/Debug/1f1xn5bz/obj/arm64-v8a/libaivideo_llama.so",
+      "runtimeFiles": [
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libllama.so",
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml.so",
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-cpu.so",
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-base.so"
+      ]
+    },
+    "ggml::@9eac4d86846e905b5082": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ggml",
+      "output": "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml.so",
+      "runtimeFiles": [
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-cpu.so",
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-base.so"
+      ]
+    },
+    "ggml-base::@9eac4d86846e905b5082": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ggml-base",
+      "output": "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-base.so",
+      "runtimeFiles": [
+        "/home/hatch/workspace/7Z1H/tools/android-sdk/ndk/30.0.16248370/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/21/lib/linux/aarch64/libomp.so"
+      ]
+    },
+    "ggml-cpu::@9eac4d86846e905b5082": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ggml-cpu",
+      "output": "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-cpu.so",
+      "runtimeFiles": [
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-base.so",
+        "/home/hatch/workspace/7Z1H/tools/android-sdk/ndk/30.0.16248370/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/21/lib/linux/aarch64/libomp.so"
+      ]
+    },
+    "llama::@1e0fa18b64cd2597abc3": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "llama",
+      "output": "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libllama.so",
+      "runtimeFiles": [
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml.so",
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-cpu.so",
+        "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/bin/libggml-base.so"
+      ]
+    },
+    "vendor-hash::@06631ad75f2613d36de6": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "vendor-hash",
+      "output": "/home/hatch/workspace/7Z1H/codes/aivideo/app/.cxx/Debug/1f1xn5bz/arm64-v8a/llama.cpp-build/vendor/hash/libvendor-hash.a"
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/home/hatch/workspace/7Z1H/tools/android-sdk/ndk/30.0.16248370/toolchains/llvm/prebuilt/linux-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/home/hatch/workspace/7Z1H/tools/android-sdk/ndk/30.0.16248370/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp",
+    "cxx",
+    "c"
+  ]
+}

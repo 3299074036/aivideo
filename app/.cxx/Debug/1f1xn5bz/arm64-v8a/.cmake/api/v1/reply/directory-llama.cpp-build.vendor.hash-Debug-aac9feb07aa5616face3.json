@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "llama.cpp-build/vendor/hash",
+		"source" : "/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/hash"
+	}
+}

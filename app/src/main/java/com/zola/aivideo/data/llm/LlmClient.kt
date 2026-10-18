@@ -1,7 +1,6 @@
 package com.zola.aivideo.data.llm
 
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -27,11 +26,11 @@ data class ChatMessage(
     }
 }
 
-/** 测试连接结果。 */
-sealed interface ConnectionTestResult {
-    /** 成功：附带服务端返回的模型数量（/v1/models）。 */
-    data class Success(val modelCount: Int) : ConnectionTestResult
-    data class Failed(val reason: String) : ConnectionTestResult
+/** 翻译测试结果（M7：真实短翻译替代 /v1/models 探测）。 */
+sealed interface TranslationTestResult {
+    /** 成功：附带译文与耗时毫秒。 */
+    data class Success(val translated: String, val elapsedMs: Long) : TranslationTestResult
+    data class Failed(val reason: String) : TranslationTestResult
 }
 
 /**
@@ -133,46 +132,37 @@ class LlmClient @Inject constructor(
         }
     }
 
-    /** 测试连接：GET /v1/models，成功返回模型数量。 */
-    suspend fun testConnection(config: LlmConfig): ConnectionTestResult {
+    /**
+     * 测试连接（M7）：发一句真实短翻译（英→中），验证整条链路可用。
+     * 成功返回译文与耗时；失败返回中文原因。
+     */
+    suspend fun testTranslation(config: LlmConfig): TranslationTestResult {
         if (!config.isComplete()) {
-            return ConnectionTestResult.Failed("请先填写完整地址、Key 和模型名")
+            return TranslationTestResult.Failed("请先填写完整地址、Key 和模型名")
         }
-        val request = Request.Builder()
-            .url(config.modelsUrl)
-            .addHeader("Authorization", "Bearer ${config.apiKey}")
-            .get()
-            .build()
+        val start = System.currentTimeMillis()
+        val sb = StringBuilder()
         return try {
-            suspendCancellableCoroutine { cont ->
-                val call = okHttp.newCall(request)
-                cont.invokeOnCancellation { call.cancel() }
-                try {
-                    val response = call.execute()
-                    if (!response.isSuccessful) {
-                        val reason = httpErrorMessage(response.code)
-                        response.close()
-                        cont.resume(ConnectionTestResult.Failed(reason))
-                        return@suspendCancellableCoroutine
-                    }
-                    val json = response.body?.string().orEmpty()
-                    response.close()
-                    val count = try {
-                        gson.fromJson(json, ModelsResponse::class.java)?.data?.size ?: 0
-                    } catch (_: Exception) {
-                        0
-                    }
-                    cont.resume(ConnectionTestResult.Success(count))
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: IOException) {
-                    cont.resume(ConnectionTestResult.Failed("网络错误：${e.message}"))
-                } catch (e: Exception) {
-                    cont.resume(ConnectionTestResult.Failed("测试失败：${e.message}"))
-                }
+            streamChat(
+                config,
+                messages = listOf(
+                    ChatMessage.system("把用户输入翻译成中文，只输出译文，不要解释。"),
+                    ChatMessage.user("Hello, how are you?"),
+                ),
+                onDelta = { sb.append(it) },
+            )
+            val text = sb.toString().trim()
+            if (text.isEmpty()) {
+                TranslationTestResult.Failed("服务端返回空译文，请检查模型名是否正确")
+            } else {
+                TranslationTestResult.Success(text, System.currentTimeMillis() - start)
             }
         } catch (e: CancellationException) {
             throw e
+        } catch (e: LlmException) {
+            TranslationTestResult.Failed(e.message ?: "翻译测试失败")
+        } catch (e: Exception) {
+            TranslationTestResult.Failed("测试失败：${e.message}")
         }
     }
 
@@ -225,12 +215,6 @@ class LlmClient @Inject constructor(
     )
     private data class DeltaContent(
         val content: String?,
-    )
-    private data class ModelsResponse(
-        val data: List<ModelsItem>?,
-    )
-    private data class ModelsItem(
-        @SerializedName("id") val id: String?,
     )
 
     private companion object {

@@ -7,13 +7,19 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zola.aivideo.data.asr.AsrModelCatalog
+import com.zola.aivideo.data.asr.AsrPreferences
+import com.zola.aivideo.data.download.ModelDownloadManager
 import com.zola.aivideo.data.task.StageState
 import com.zola.aivideo.data.task.TaskRepository
 import com.zola.aivideo.data.task.TaskStage
 import com.zola.aivideo.data.work.TaskScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
@@ -32,6 +38,8 @@ class TaskDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
     private val scheduler: TaskScheduler,
+    private val downloadManager: ModelDownloadManager,
+    private val asrPrefs: AsrPreferences,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -40,9 +48,34 @@ class TaskDetailViewModel @Inject constructor(
     val snapshot = repository.observeSnapshot(taskId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    /** 重试失败阶段（已完成产物复用）。 */
+    /** 用户提示消息（Snackbar 展示）。 */
+    private val _messages = MutableSharedFlow<String>()
+    val messages: SharedFlow<String> = _messages.asSharedFlow()
+
+    /**
+     * 重试失败阶段（已完成产物复用）。
+     *
+     * 诊断（2026-10-17）：用户反馈点"开始识别"没反应，此处加即时反馈与异常上报，
+     * 区分"点击未生效 / 调度抛异常 / Worker 未运行"。
+     */
     fun retryStage(stage: TaskStage) {
-        viewModelScope.launch { scheduler.scheduleStage(taskId, stage) }
+        viewModelScope.launch {
+            try {
+                // 识别阶段前置检查：ASR 模型必须已下载，否则 Worker 里才报错用户看不到
+                if (stage == TaskStage.TRANSCRIBE) {
+                    val model = asrPrefs.getSelectedModel()
+                    val entry = AsrModelCatalog.entryOf(model)
+                    if (!downloadManager.isInstalled(entry)) {
+                        _messages.emit("语音模型尚未下载，请先去模型管理页下载")
+                        return@launch
+                    }
+                }
+                _messages.emit("已提交${stage.displayName}任务…")
+                scheduler.scheduleStage(taskId, stage)
+            } catch (e: Exception) {
+                _messages.emit("提交失败：${e.message ?: e.javaClass.simpleName}")
+            }
+        }
     }
 
     /** 取消运行中的阶段。 */

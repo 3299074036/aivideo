@@ -38,7 +38,6 @@ import com.zola.aivideo.ui.theme.DefaultAiVideoTokens
 fun SettingsScreen(
     onBack: () -> Unit,
     onOpenModels: () -> Unit,
-    onOpenTtsModels: () -> Unit,
     onOpenLlmSettings: () -> Unit,
     onOpenTtsSettings: () -> Unit,
     onOpenGlossary: () -> Unit,
@@ -69,9 +68,9 @@ fun SettingsScreen(
         ) {
             Spacer(Modifier.height(tokens.spacing.sm))
             SettingsGroup("模型与服务") {
-                SettingsRow("语音模型管理", "Whisper / SenseVoice 下载与切换", onOpenModels)
-                SettingsRow("配音模型管理", "Kokoro TTS 模型下载", onOpenTtsModels)
-                SettingsRow("LLM 设置", "翻译用大模型（BYOK）", onOpenLlmSettings)
+                // 2026-10-17：语音/语言/配音三类模型统一在模型管理页
+                SettingsRow("模型管理", "语音 / 语言 / 配音模型下载与切换", onOpenModels)
+                SettingsRow("LLM 设置", "翻译用大模型（API / 本地）", onOpenLlmSettings)
                 SettingsRow("云 TTS 设置", "云端配音（BYOK，备选）", onOpenTtsSettings)
                 SettingsRow("术语表", "翻译术语固定译法", onOpenGlossary)
             }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -128,6 +129,11 @@ fun DubProgressScreen(
                     style = tokens.type.caption,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            } else {
+                // 兜底（2026-10-17）：三态都不满足时不空白，显示准备中
+                CircularProgressIndicator()
+                Spacer(Modifier.height(tokens.spacing.md))
+                Text("准备中…", style = tokens.type.body)
             }
         }
     }

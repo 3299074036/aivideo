@@ -87,7 +87,13 @@ class TranslateResultViewModel @Inject constructor(
     }
 
     companion object {
-        /** SAF 创建文档 contract，Screen 层使用。 */
-        val CreateSrtDocument = ActivityResultContracts.CreateDocument("text/plain")
+        /**
+         * SAF 创建文档 contract，Screen 层使用。
+         *
+         * 修复（2026-10-17）：MIME 必须用 application/x-subrip（SubRip 标准类型）。
+         * 之前用 text/plain，OPPO 文件管理器会自动把扩展名存成 .txt，
+         * 用户被迫手动改名才能导入。
+         */
+        val CreateSrtDocument = ActivityResultContracts.CreateDocument("application/x-subrip")
     }
 }

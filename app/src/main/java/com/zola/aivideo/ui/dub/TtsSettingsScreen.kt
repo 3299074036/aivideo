@@ -2,6 +2,8 @@ package com.zola.aivideo.ui.dub
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -17,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,11 +34,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zola.aivideo.data.tts.TtsProviderCatalog
 import com.zola.aivideo.ui.theme.DefaultAiVideoTokens
 
 /**
@@ -44,7 +53,7 @@ import com.zola.aivideo.ui.theme.DefaultAiVideoTokens
  * - 测试连接：请求 1 段短文本合成，验证连通性
  * - 隐私告知：配音文本会发送到云端服务商
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun TtsSettingsScreen(
     onBack: () -> Unit,
@@ -52,6 +61,8 @@ fun TtsSettingsScreen(
 ) {
     val tokens = DefaultAiVideoTokens
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
+    val provider = uiState.provider
 
     Scaffold(
         topBar = {
@@ -88,11 +99,51 @@ fun TtsSettingsScreen(
                 )
             }
 
+            // 服务商预设（M7）
+            Text("服务商预设", style = tokens.type.titleSmall)
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(tokens.spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(tokens.spacing.sm),
+            ) {
+                TtsProviderCatalog.all.forEach { p ->
+                    FilterChip(
+                        selected = uiState.providerId == p.id,
+                        onClick = { viewModel.selectProvider(p) },
+                        label = { Text(p.displayName, style = tokens.type.label) },
+                    )
+                }
+            }
+            if (provider.keyHint.isNotBlank()) {
+                Text(
+                    provider.keyHint,
+                    style = tokens.type.caption,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (provider.keyUrl.isNotBlank()) {
+                val linkText = buildAnnotatedString {
+                    append("没有 Key？去")
+                    pushStringAnnotation(tag = "url", annotation = provider.keyUrl)
+                    pushStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, textDecoration = TextDecoration.Underline))
+                    append("${provider.displayName}官网获取")
+                    pop()
+                    append(" →")
+                }
+                ClickableText(
+                    text = linkText,
+                    style = tokens.type.caption,
+                    onClick = { offset ->
+                        linkText.getStringAnnotations(tag = "url", start = offset, end = offset)
+                            .firstOrNull()?.let { uriHandler.openUri(it.item) }
+                    },
+                )
+            }
+
             OutlinedTextField(
                 value = uiState.baseUrl,
                 onValueChange = viewModel::setBaseUrl,
                 label = { Text("Base URL") },
-                placeholder = { Text("https://api.openai.com/v1") },
+                placeholder = { Text("https://api.siliconflow.cn/v1") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
@@ -131,10 +182,30 @@ fun TtsSettingsScreen(
                 value = uiState.voice,
                 onValueChange = viewModel::setVoice,
                 label = { Text("音色名") },
-                placeholder = { Text("alloy") },
+                placeholder = { Text("FunAudioLLM/CosyVoice2-0.5B:diana") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
             )
+            // 音色候选（一键填入）
+            if (provider.voices.size > 1) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(tokens.spacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(tokens.spacing.sm),
+                ) {
+                    provider.voices.forEach { candidate ->
+                        FilterChip(
+                            selected = uiState.voice == candidate,
+                            onClick = { viewModel.setVoice(candidate) },
+                            label = {
+                                Text(
+                                    candidate.substringAfterLast(":"),
+                                    style = tokens.type.caption,
+                                )
+                            },
+                        )
+                    }
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -29,6 +29,9 @@ class LlmPreferences @Inject constructor(
     private object Keys {
         val BASE_URL = stringPreferencesKey("base_url")
         val MODEL = stringPreferencesKey("model")
+        val PROVIDER = stringPreferencesKey("provider")
+        val ENGINE = stringPreferencesKey("engine")
+        val LOCAL_MODEL = stringPreferencesKey("local_model")
     }
 
     val baseUrl: Flow<String> = context.llmDataStore.data.map { prefs ->
@@ -37,6 +40,11 @@ class LlmPreferences @Inject constructor(
 
     val model: Flow<String> = context.llmDataStore.data.map { prefs ->
         prefs[Keys.MODEL] ?: DEFAULT_MODEL
+    }
+
+    /** 当前选择的服务商预设 id（M7），默认 custom（保持老用户原有手填配置不变）。 */
+    val provider: Flow<String> = context.llmDataStore.data.map { prefs ->
+        prefs[Keys.PROVIDER] ?: LlmProviderCatalog.CUSTOM.id
     }
 
     suspend fun setBaseUrl(baseUrl: String) {
@@ -49,6 +57,34 @@ class LlmPreferences @Inject constructor(
 
     suspend fun getBaseUrl(): String = baseUrl.first()
     suspend fun getModel(): String = model.first()
+
+    suspend fun setProvider(providerId: String) {
+        context.llmDataStore.edit { it[Keys.PROVIDER] = providerId }
+    }
+
+    suspend fun getProvider(): String = provider.first()
+
+    /** LLM 引擎选择（M7）：API / 本地，默认 API。 */
+    val llmEngine: Flow<LlmEngineId> = context.llmDataStore.data.map { prefs ->
+        LlmEngineId.fromId(prefs[Keys.ENGINE])
+    }
+
+    suspend fun setLlmEngine(engine: LlmEngineId) {
+        context.llmDataStore.edit { it[Keys.ENGINE] = engine.id }
+    }
+
+    suspend fun getLlmEngine(): LlmEngineId = llmEngine.first()
+
+    /** 本地语言模型选择（M7）：LlmModelCatalog 的 entry id，默认 Qwen3-0.6B。 */
+    val localModel: Flow<String> = context.llmDataStore.data.map { prefs ->
+        prefs[Keys.LOCAL_MODEL] ?: LlmModelCatalog.DEFAULT_ID
+    }
+
+    suspend fun setLocalModel(modelId: String) {
+        context.llmDataStore.edit { it[Keys.LOCAL_MODEL] = modelId }
+    }
+
+    suspend fun getLocalModel(): String = localModel.first()
 
     companion object {
         const val DEFAULT_BASE_URL = "https://api.openai.com"

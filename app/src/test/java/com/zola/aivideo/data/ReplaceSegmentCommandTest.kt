@@ -2,7 +2,7 @@ package com.zola.aivideo.data
 
 import com.zola.aivideo.data.ffmpeg.FFmpegCommandBuilder
 import com.zola.aivideo.data.synthesize.SynthesizeOptions
-import com.zola.aivideo.data.work.SynthesizeWorker
+import com.zola.aivideo.data.work.SynthesizeStageRunner
 import com.google.gson.Gson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -74,13 +74,13 @@ class ReplaceSegmentCommandTest {
             // 选用 + 文件存在 → 替换版
             assertEquals(
                 replaced.absolutePath,
-                SynthesizeWorker.resolveVideoSource(true, src, replaced),
+                SynthesizeStageRunner.resolveVideoSource(true, src, replaced),
             )
             // 未选用 → 源视频
-            assertEquals(src, SynthesizeWorker.resolveVideoSource(false, src, replaced))
+            assertEquals(src, SynthesizeStageRunner.resolveVideoSource(false, src, replaced))
             // 选用但文件被删 → 回落源视频（不阻断合成）
             replaced.delete()
-            assertEquals(src, SynthesizeWorker.resolveVideoSource(true, src, replaced))
+            assertEquals(src, SynthesizeStageRunner.resolveVideoSource(true, src, replaced))
         } finally {
             dir.deleteRecursively()
         }

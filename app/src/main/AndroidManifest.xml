@@ -16,6 +16,7 @@
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.AiVideo"
         android:allowBackup="false"
+        android:extractNativeLibs="true"
         android:supportsRtl="true">
 
         <activity
@@ -33,21 +34,7 @@
             </intent-filter>
         </activity>
 
-        <!-- M5：禁用 WorkManager 默认初始化，改由 AiVideoApp 手动注入 AiVideoWorkerFactory。
-             血泪教训：不要用 @HiltWorker（Hilt 2.57.2 + KSP 下绑定代码不生成）。 -->
-        <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            android:exported="false"
-            tools:node="remove" />
-
-        <!-- M5：WorkManager 的 SystemForegroundService 以 dataSync 类型 startForeground，
-             manifest 里必须声明该类型，否则 API 31+ 系统线程直接抛异常闪退（try-catch 罩不住）。
-             血泪教训：用 tools:node="merge" 把类型声明合并到 WorkManager 自带的 service 声明上。 -->
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync"
-            tools:node="merge" />
+        <!-- 2026-10-17：WorkManager 已移除（改用 TaskScheduler + StageRunner 前台协程）。 -->
 
         <!-- M5：成品视频分享/打开（FileProvider，只暴露 filesDir 下文件） -->
         <provider

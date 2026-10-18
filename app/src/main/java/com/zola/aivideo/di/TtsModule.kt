@@ -2,6 +2,7 @@ package com.zola.aivideo.di
 
 import com.zola.aivideo.data.asr.AsrModelCatalog
 import com.zola.aivideo.data.download.DownloadableModel
+import com.zola.aivideo.data.llm.LlmModelCatalog
 import com.zola.aivideo.data.tts.TtsModelCatalog
 import dagger.Module
 import dagger.Provides
@@ -37,5 +38,5 @@ object TtsModule {
     @Provides
     @Singleton
     fun provideDownloadableModels(): List<@JvmSuppressWildcards DownloadableModel> =
-        AsrModelCatalog.entries + TtsModelCatalog.entry
+        AsrModelCatalog.entries + TtsModelCatalog.entry + LlmModelCatalog.entries
 }

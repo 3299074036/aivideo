@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.zola.aivideo.BuildConfig
 import com.zola.aivideo.ui.theme.DefaultAiVideoTokens
 
@@ -39,6 +40,7 @@ import com.zola.aivideo.ui.theme.DefaultAiVideoTokens
 fun AboutScreen(
     onBack: () -> Unit,
     onViewLicenseText: (assetPath: String, title: String) -> Unit,
+    viewModel: AboutViewModel = hiltViewModel(),
 ) {
     val tokens = DefaultAiVideoTokens
 
@@ -68,6 +70,14 @@ fun AboutScreen(
                     "版本 ${BuildConfig.VERSION_NAME}（${BuildConfig.VERSION_CODE}）",
                     style = tokens.type.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            // 诊断信息（2026-10-17 从模型管理页搬来）
+            item {
+                DiagnosticsCard(
+                    ffmpegVersion = viewModel.ffmpegVersion,
+                    ffmpegError = viewModel.ffmpegError,
                 )
             }
 
@@ -152,6 +162,44 @@ fun AboutScreen(
                 }
             }
             item { Spacer(Modifier.height(tokens.spacing.xl)) }
+        }
+    }
+}
+
+/** 诊断卡：FFmpeg 版本；加载失败时展示原始错误。（2026-10-17 从模型管理页搬来） */
+@Composable
+private fun DiagnosticsCard(ffmpegVersion: String?, ffmpegError: String?) {
+    val tokens = DefaultAiVideoTokens
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = tokens.corners.md,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+    ) {
+        Column(Modifier.padding(tokens.spacing.lg)) {
+            Text("诊断信息", style = tokens.type.titleSmall)
+            Spacer(Modifier.height(tokens.spacing.sm))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    "FFmpeg 版本",
+                    style = tokens.type.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    ffmpegVersion ?: "未知（真机上查看）",
+                    style = tokens.type.bodySmall,
+                )
+            }
+            if (ffmpegError != null) {
+                Spacer(Modifier.height(tokens.spacing.sm))
+                Text(
+                    "加载错误：$ffmpegError",
+                    style = tokens.type.caption,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
         }
     }
 }

@@ -1,0 +1,12 @@
+/home/hatch/workspace/7Z1H/codes/aivideo/app/src/main/cpp/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/ggml/src/ggml-cpu/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/src/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/hash/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/miniaudio/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/nlohmann/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/sheredom/CMakeLists.txt
+/home/hatch/workspace/7Z1H/dependencies/llama.cpp/llama.cpp-0.7.0/vendor/stb/CMakeLists.txt

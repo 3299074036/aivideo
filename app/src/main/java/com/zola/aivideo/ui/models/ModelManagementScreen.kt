@@ -41,17 +41,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.zola.aivideo.data.asr.AsrModelCatalog
 import com.zola.aivideo.data.download.ModelDownloadState
 import com.zola.aivideo.data.media.FormatUtils
 import com.zola.aivideo.ui.theme.DefaultAiVideoTokens
 
 /**
- * 语音模型管理页。
+ * 模型管理页。
  *
- * - 三档模型：radio 切换（仅已下载可选）、体积展示
+ * - 语音模型：三档 ASR，radio 切换（仅已下载可选）、体积展示
+ * - 语言模型（M7）：Qwen GGUF，radio 切换（仅已下载可选），供本地 LLM 引擎用
  * - 下载/暂停/继续/重试/删除，进度条 + 已下载/总量
- * - 「仅 Wi-Fi 下载」开关
+ * - 「仅 Wi-Fi 下载」开关（页面级，两类模型共用）
  * - 底部 FFmpeg 版本诊断行（M1 报告承诺）
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,7 +63,7 @@ fun ModelManagementScreen(
     val tokens = DefaultAiVideoTokens
     val states by viewModel.downloadStates.collectAsState()
     val selected by viewModel.selectedModel.collectAsState()
-    val wifiOnly by viewModel.wifiOnly.collectAsState()
+    val selectedLlm by viewModel.selectedLlmModel.collectAsState()
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -73,7 +73,7 @@ fun ModelManagementScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("语音模型", style = tokens.type.titleSmall) },
+                title = { Text("模型管理", style = tokens.type.titleSmall) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
@@ -91,13 +91,12 @@ fun ModelManagementScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(tokens.spacing.md),
         ) {
-            WifiOnlyRow(
-                checked = wifiOnly,
-                onCheckedChange = viewModel::onWifiOnlyChange,
-            )
+            Text("语音模型", style = tokens.type.titleSmall)
             viewModel.entries.forEach { entry ->
                 ModelCard(
-                    entry = entry,
+                    displayName = entry.displayName,
+                    description = entry.description,
+                    sizeLabel = entry.sizeLabel,
                     state = states[entry.model.id] ?: ModelDownloadState.NotDownloaded,
                     selected = selected == entry.model,
                     onSelect = { viewModel.onSelect(entry.model) },
@@ -106,47 +105,61 @@ fun ModelManagementScreen(
                     onDelete = { viewModel.onDelete(entry) },
                 )
             }
+            Text("语言模型", style = tokens.type.titleSmall)
+            Text(
+                text = "本机运行的翻译模型（llama.cpp），断网可用；长视频翻译比 API 慢且更烫",
+                style = tokens.type.caption,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            viewModel.llmEntries.forEach { entry ->
+                ModelCard(
+                    displayName = entry.displayName,
+                    description = entry.description,
+                    sizeLabel = entry.sizeLabel,
+                    state = states[entry.id] ?: ModelDownloadState.NotDownloaded,
+                    selected = selectedLlm == entry.id,
+                    onSelect = { viewModel.onSelectLlm(entry.id) },
+                    onDownload = { viewModel.onDownloadLlm(entry) },
+                    onPause = { viewModel.onPauseLlm(entry) },
+                    onDelete = { viewModel.onDeleteLlm(entry) },
+                )
+            }
+            // 配音模型（2026-10-17 从独立页面合并进来）
+            Text("配音模型", style = tokens.type.titleSmall)
+            Text(
+                text = "本机运行的配音模型（Kokoro），断网可用；103 个音色",
+                style = tokens.type.caption,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            run {
+                val entry = viewModel.ttsEntry
+                // 配音模型单选：已下载即视为选中（无多模型切换）
+                val installed = states[entry.id] is ModelDownloadState.Completed
+                ModelCard(
+                    displayName = entry.displayName,
+                    description = entry.description,
+                    sizeLabel = entry.sizeLabel,
+                    state = states[entry.id] ?: ModelDownloadState.NotDownloaded,
+                    selected = installed,
+                    onSelect = { /* 单模型，无需切换 */ },
+                    onDownload = { viewModel.onDownloadTts() },
+                    onPause = { viewModel.onPauseTts() },
+                    onDelete = { viewModel.onDeleteTts() },
+                )
+            }
             Text(
                 text = "模型下载到应用私有目录，不占系统公共空间，随应用卸载自动清除。",
                 style = tokens.type.caption,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            DiagnosticsCard(ffmpegVersion = viewModel.ffmpegVersion)
         }
     }
 }
-
-@Composable
-private fun WifiOnlyRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    val tokens = DefaultAiVideoTokens
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = tokens.corners.md,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(tokens.spacing.lg),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text("仅 Wi-Fi 下载模型", style = tokens.type.bodySmall)
-                Text(
-                    "模型上百 MB，移动数据下载可能产生流量费用",
-                    style = tokens.type.caption,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
-        }
-    }
-}
-
 @Composable
 private fun ModelCard(
-    entry: AsrModelCatalog.Entry,
+    displayName: String,
+    description: String,
+    sizeLabel: String,
     state: ModelDownloadState,
     selected: Boolean,
     onSelect: () -> Unit,
@@ -161,25 +174,21 @@ private fun ModelCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column(Modifier.padding(tokens.spacing.lg)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.Top) {
                 RadioButton(
                     selected = selected,
                     onClick = onSelect,
                     enabled = state is ModelDownloadState.Completed,
                 )
                 Column(Modifier.weight(1f)) {
-                    Text(entry.displayName, style = tokens.type.titleSmall)
+                    Text(displayName, style = tokens.type.titleSmall)
+                    Spacer(Modifier.height(tokens.spacing.xs))
                     Text(
-                        entry.description,
+                        "$sizeLabel · $description",
                         style = tokens.type.caption,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                Text(
-                    entry.sizeLabel,
-                    style = tokens.type.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
             Spacer(Modifier.height(tokens.spacing.sm))
             when (state) {
@@ -277,32 +286,3 @@ private fun StatusLine(text: String, positive: Boolean = false, error: Boolean =
     Text(text, style = tokens.type.bodySmall, color = color)
 }
 
-/** 诊断卡：FFmpeg 版本（M1 报告承诺的真机验证入口）。 */
-@Composable
-private fun DiagnosticsCard(ffmpegVersion: String?) {
-    val tokens = DefaultAiVideoTokens
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = tokens.corners.md,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-    ) {
-        Column(Modifier.padding(tokens.spacing.lg)) {
-            Text("诊断信息", style = tokens.type.titleSmall)
-            Spacer(Modifier.height(tokens.spacing.sm))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    "FFmpeg 版本",
-                    style = tokens.type.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    ffmpegVersion ?: "未知（真机上查看）",
-                    style = tokens.type.bodySmall,
-                )
-            }
-        }
-    }
-}

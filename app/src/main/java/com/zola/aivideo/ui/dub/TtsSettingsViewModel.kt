@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zola.aivideo.data.tts.TtsCredentialStore
 import com.zola.aivideo.data.tts.TtsPreferences
+import com.zola.aivideo.data.tts.TtsProvider
+import com.zola.aivideo.data.tts.TtsProviderCatalog
 import com.zola.aivideo.data.tts.engine.OpenAiTtsEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +23,15 @@ data class TtsSettingsUiState(
     val showApiKey: Boolean = false,
     val model: String = "tts-1",
     val voice: String = "alloy",
+    val providerId: String = TtsProviderCatalog.CUSTOM.id,
     val wifiOnly: Boolean = true,
     val testing: Boolean = false,
     val testResult: TtsTestResult? = null,
 ) {
     val canTest: Boolean get() = (apiKeyInput.isNotBlank() || hasApiKey) && baseUrl.isNotBlank()
+
+    /** 当前服务商预设。 */
+    val provider: TtsProvider get() = TtsProviderCatalog.byId(providerId)
 }
 
 data class TtsTestResult(val success: Boolean, val message: String)
@@ -52,13 +58,20 @@ class TtsSettingsViewModel @Inject constructor(
                 baseUrl = prefs.cloudBaseUrl.first(),
                 model = prefs.cloudModel.first(),
                 voice = prefs.cloudVoice.first(),
+                providerId = prefs.getCloudProvider(),
                 wifiOnly = prefs.isWifiOnlyDownload(),
                 hasApiKey = credentialStore.hasApiKey(),
             )
         }
     }
 
-    fun setBaseUrl(v: String) { _uiState.value = _uiState.value.copy(baseUrl = v) }
+    fun setBaseUrl(v: String) {
+        _uiState.value = _uiState.value.copy(
+            baseUrl = v,
+            // 手改地址后视为脱离预设
+            providerId = TtsProviderCatalog.CUSTOM.id,
+        )
+    }
     fun setApiKeyInput(v: String) { _uiState.value = _uiState.value.copy(apiKeyInput = v) }
     fun setModel(v: String) { _uiState.value = _uiState.value.copy(model = v) }
     fun setVoice(v: String) { _uiState.value = _uiState.value.copy(voice = v) }
@@ -70,13 +83,25 @@ class TtsSettingsViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(showApiKey = !_uiState.value.showApiKey)
     }
 
-    /** 保存 Base URL / 模型 / 音色；Key 非空则覆盖保存。 */
+    /** 点选服务商预设：一键填入地址、模型与音色（需点"保存"落盘）。 */
+    fun selectProvider(provider: TtsProvider) {
+        _uiState.value = _uiState.value.copy(
+            providerId = provider.id,
+            baseUrl = provider.baseUrl.ifBlank { _uiState.value.baseUrl },
+            model = provider.model.ifBlank { _uiState.value.model },
+            voice = provider.voices.firstOrNull() ?: _uiState.value.voice,
+            testResult = null,
+        )
+    }
+
+    /** 保存 Base URL / 模型 / 音色 / 服务商；Key 非空则覆盖保存。 */
     fun save() {
         viewModelScope.launch {
             val s = _uiState.value
             prefs.setCloudBaseUrl(s.baseUrl)
             prefs.setCloudModel(s.model.trim().ifBlank { "tts-1" })
             prefs.setCloudVoice(s.voice.trim().ifBlank { "alloy" })
+            prefs.setCloudProvider(s.providerId)
             if (s.apiKeyInput.isNotBlank()) {
                 credentialStore.setApiKey(s.apiKeyInput)
             }
@@ -99,6 +124,7 @@ class TtsSettingsViewModel @Inject constructor(
                 prefs.setCloudBaseUrl(s.baseUrl)
                 prefs.setCloudModel(s.model.trim().ifBlank { "tts-1" })
                 prefs.setCloudVoice(s.voice.trim().ifBlank { "alloy" })
+                prefs.setCloudProvider(s.providerId)
                 if (s.apiKeyInput.isNotBlank()) credentialStore.setApiKey(s.apiKeyInput)
                 _uiState.value = _uiState.value.copy(
                     apiKeyInput = "",

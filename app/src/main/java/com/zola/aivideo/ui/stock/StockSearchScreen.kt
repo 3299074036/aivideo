@@ -1,5 +1,7 @@
 package com.zola.aivideo.ui.stock
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +16,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +59,20 @@ fun StockSearchScreen(
 ) {
     val tokens = DefaultAiVideoTokens
     val s by viewModel.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    // 本地视频选择器（2026-10-17 本地化：无 Key 时的本地替代方案）
+    val localPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            if (uri != null) {
+                scope.launch {
+                    val fileName = viewModel.importLocalVideo(uri)
+                    if (fileName != null) onReplaceClip(fileName)
+                }
+            }
+        },
+    )
 
     Scaffold(
         topBar = {
@@ -73,6 +93,27 @@ fun StockSearchScreen(
                 .padding(horizontal = tokens.spacing.xl),
             verticalArrangement = Arrangement.spacedBy(tokens.spacing.md),
         ) {
+            // 本地视频入口（2026-10-17）：无需 Key，直接从本机选视频作素材
+            item {
+                Spacer(Modifier.height(tokens.spacing.sm))
+                OutlinedButton(
+                    onClick = { localPicker.launch("video/*") },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.FolderOpen,
+                        contentDescription = null,
+                    )
+                    Spacer(Modifier.width(tokens.spacing.sm))
+                    Text("从本地选择视频", style = tokens.type.label)
+                }
+                Spacer(Modifier.height(tokens.spacing.xs))
+                Text(
+                    "无 API Key 时用本地视频代替在线素材",
+                    style = tokens.type.caption,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             item {
                 Spacer(Modifier.height(tokens.spacing.sm))
                 Row(verticalAlignment = Alignment.CenterVertically) {
